@@ -14,10 +14,14 @@ const log = require('ololog').configure({
   locate: false
 })
 
+
+
 class Btns extends Component {
 
   constructor(props) {
     super(props)
+
+    console.log('props', props)
 
     this.increaseCount = this.increaseCount.bind(this)
     this.decreaseCount = this.decreaseCount.bind(this)
@@ -74,8 +78,6 @@ function mapDispatchToProps (dispatch) {
     actions: bindActionCreators(actions, dispatch)
   }
 }
-
-
 
 const CounterBtns = connect(
   mapStateToProps,
