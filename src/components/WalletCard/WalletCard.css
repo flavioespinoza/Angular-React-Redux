@@ -1,0 +1,69 @@
+.demo-card-wide.mdl-card {
+  width: 512px;
+  float: left; }
+
+.demo-card-wide .mdl-card__title {
+  color: #fff;
+  height: 176px;
+  background: #7f7f7f;
+  transition: height 0.25s ease-out; }
+.demo-card-wide .mdl-card__title.title-collapse {
+  height: 56px;
+  transition: height 0.25s ease-in; }
+
+.demo-card-wide > .mdl-card__menu {
+  color: #fff; }
+
+.qr-code__image {
+  margin-top: -22px;
+  margin-left: 0;
+  pointer-events: none;
+  height: 0;
+  transition: height 0.25s ease-out; }
+
+.qr-code__image.qr-code__fade-in {
+  height: 200px;
+  transition: height 0.25s ease-in; }
+
+.address-hash {
+  position: absolute;
+  display: none;
+  width: 300px;
+  left: 6px;
+  bottom: 20px;
+  text-align: center;
+  color: cornflowerblue;
+  padding: 4px 8px;
+  cursor: copy;
+  z-index: 10;
+  transition: display 0.50s ease-out; }
+
+.copy__confirm {
+  display: none;
+  color: #3e3e3e;
+  background: lightgreen;
+  border-radius: 12px; }
+
+.address-hash__fade-in {
+  display: block;
+  transition: height 0.50s ease-in; }
+
+.hide {
+  display: none; }
+
+.mdl-card__menu {
+  top: 10px; }
+
+.mdl-card__supporting-text {
+  position: relative;
+  height: 20px;
+  transition: height 0.25s ease-out; }
+
+.mdl-card__supporting-text.text-expand {
+  height: 200px;
+  transition: height 0.25s ease-in; }
+
+.mdl-card__supporting-text {
+  width: calc(100% - 40px); }
+
+/*# sourceMappingURL=WalletCard.css.map */
