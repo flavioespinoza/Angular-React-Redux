@@ -3,3 +3,16 @@ body {
   padding: 0;
   font-family: sans-serif;
 }
+.w100 {
+  width: 100%;
+}
+
+#counterBtns {
+  padding: 12px;
+}
+
+#counterBtnsWrapper {
+  padding: 4px;
+  overflow: hidden;
+  background: pink;
+}

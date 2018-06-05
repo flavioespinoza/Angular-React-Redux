@@ -9,11 +9,19 @@ export default function reducer (state = {
   hello_msg: 'Hello Ren!',
   data: [],
   count: 0,
+  btc_wallets: null,
 
 }, action) {
 
   switch (action.type) {
 
+    case 'SET_BTC_WALLETS': {
+      // log.blue('SET_BTC_WALLETS', action.payload)
+      return {
+        ...state,
+        btc_wallets: action.payload
+      }
+    }
     case 'SET_HELLO_MESSAGE': {
       // log.blue('SET_HELLO_MESSAGE', action.payload)
       return {
@@ -29,7 +37,7 @@ export default function reducer (state = {
       }
     }
     case 'INCREMENT_COUNT': {
-      log.red('INCREMENT_COUNT', JSON.stringify(action.payload))
+      // log.red('INCREMENT_COUNT', JSON.stringify(action.payload))
       return {
         ...state,
         count: action.payload,
