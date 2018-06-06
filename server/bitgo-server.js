@@ -1,16 +1,12 @@
 const express = require('express')
-const http = require('http')
-const socketIo = require('socket.io')
-
-const index = require('./routes/index')
-const port = process.env.PORT || 9001
 const app = express()
+const port = process.env.PORT || 9001
+const http = require('http')
+const index = require('./routes/index')
 const server = http.createServer(app)
+const socketIo = require('socket.io')
 const io = socketIo(server)
-
 const BitGoJS = require('bitgo')
-const Q = require('q')
-const _ = require('lodash')
 const log = require('ololog').configure({locate: false})
 
 app.use(index)
@@ -32,79 +28,63 @@ const wallet_params = {
   }
 }
 
-const wallet_name = wallet_params.name
-const api_key = wallet_params.apiKey
-const secret_key = wallet_params.secret
-const secret_passphrase = wallet_params.secret_passphrase
-
 const bitgo = new BitGoJS.BitGo({
-  env: 'test', accessToken: secret_key
+  env: 'test', accessToken: wallet_params.secret
 })
-
-let btc_testnet_coins = {
-  btc_address_testnet: '2N8hwP1WmJrFF5QWABn38y63uYLhnJYJYTF',
-  website: 'https://testnet.manu.backend.hamburg/faucet'
-}
-
-const constants = []
 const divisor = 100000000
 
-bitgo.fetchConstants().then(function (constants) {
+async function get_wallet_list (__coin, __socket) {
 
-  // log.lightBlue(JSON.stringify(constants, null, 2))
+  try {
 
-})
+    return bitgo.coin(__coin).wallets().list({}).then(async function (wallets) {
 
-bitgo.session({}, function callback (err, session) {
-
-  if (err) {
-    log.red('bitgo.session ERROR', err)
-    return
-  }
-
-})
-
-async function get_wallet_list (__coin) {
-
-  const wallet_list = []
-
-  return new Promise(function (resolve, reject) {
-
-    return bitgo.coin(__coin).wallets().list({}).then(function (wallets) {
+      const wallet_list = []
 
       let all_wallets = wallets.wallets
 
-      return Q.allSettled(all_wallets.map(async (__wallet) => {
+      for (let i = 0; i < all_wallets.length; i++) {
 
-        wallet_list.push(await get_wallet(__wallet._wallet.id))
+        let id = all_wallets[i]._wallet.id
 
-      })).then(function (__res) {
+        let single_wallet = await get_wallet(__coin, id, __socket)
 
-        resolve(wallet_list)
+        if (!single_wallet.address) {
+          wallet_list.push({success: false, message: single_wallet, wallet: {}})
+        } else {
+          wallet_list.push({success: true, message: 'success', wallet: single_wallet})
+        }
 
-      })
+      }
+
+      // log.blue(JSON.stringify(wallet_list, null, 2))
+
+      let list_name = __coin + '_wallet_list'
+      __socket.emit(list_name, wallet_list)
+
+    }).catch(function (__err) {
+
+      log.red('error_get_wallet_list', __err.message)
+
+      __socket.emit('error_get_wallet_list', { message: __err.message, in_function: 'get_wallet_list' })
 
     })
 
-  }).then(function (response) {
+  } catch (__err) {
 
-    return response
+    log.cyan('error_get_wallet_list', __err.message)
 
-  }).catch(function (err) {
+    __socket.emit('error_get_wallet_list', { message: __err.message, in_function: 'get_wallet_list' })
 
-    log.red('get_wallet_list ERROR ', err)
-
-  })
+  }
 
 }
 
-async function get_wallet (__wallet_id) {
+async function get_wallet (__coin, __wallet_id, __socket) {
 
-  return new Promise(function (resolve, reject) {
+  try {
 
-    return bitgo.coin('tbtc').wallets().get({id: __wallet_id}).then(function (wallet) {
-
-      // log.yellow(JSON.stringify(wallet._wallet, null, 2))
+    return bitgo.coin(__coin).wallets().get({id: __wallet_id}).then(function (wallet) {
 
       let wallet_info = {}
       let __wallet = wallet._wallet
@@ -115,38 +95,32 @@ async function get_wallet (__wallet_id) {
       wallet_info.satoshi = __wallet.balance
       wallet_info.balance = wallet_info.satoshi / divisor
 
-      // log.cyan(JSON.stringify(wallet_info, null, 2))
+      return wallet_info
 
-      resolve(wallet_info)
+    }).catch(function (__err) {
+
+      log.lightYellow('error_get_wallet', __err.message)
+
+      return __err.message
 
     })
 
-  }).then(function (response) {
-    return response
-  }).catch(function (err) {
-    log.red('get_wallet ERROR ', err)
-  })
+  } catch (__err) {
 
-}
+    log.bright.blue('error_get_wallet', __err.message)
 
-async function test_1 (__info) {
-  log.black('test_1', JSON.stringify(__info))
-}
+    __socket.emit('error_get_wallet', { message: __err.message, in_function: 'get_wallet' })
 
-function test_2 (__info) {
-  log.cyan('test_2', JSON.stringify(__info, null, 2))
+
+  }
+
 }
 
 /** Websocket */
 io.on('connection', socket => {
 
-  socket.on('get_btc_wallet_list', function () {
-    (async function () {
-      let wallet_list = await get_wallet_list('tbtc')
-      log.blue(JSON.stringify(wallet_list, null, 2))
-      socket.emit('btc_wallet_list', wallet_list)
-      log.green('emit btc_wallet_list')
-    })()
+  socket.on('get_tbtc_wallet_list', async function () {
+    await get_wallet_list('tbtc', socket)
   })
 
   console.log('connected...')

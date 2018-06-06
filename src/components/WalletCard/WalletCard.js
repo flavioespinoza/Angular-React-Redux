@@ -79,73 +79,76 @@ class Card extends Component {
   render() {
 
     const self = this
-
-    let wallet_obj =   {
-      "label": "Bittrex",
-      "coin": "tbtc",
-      "balance": 0.91015287,
-      "address": "2MxhSJPqgFyxhnmypbx26pi24vhHuAcC1SD",
-      "satoshi": 91015287
-    }
-
     const style = {
       btn: {
         fontSize: 11
       }
     }
 
-    const btc_wallets = _.map(this.props.btc_wallets, function (__obj, __idx) {
+    const btc_wallets = _.map(this.props.btc_wallets, function (__wallet, __idx) {
 
-      const coin = __obj.coin.toUpperCase()
+      const __obj = __wallet.wallet
 
-      const qr_code_url = 'https://chart.googleapis.com/chart?chs=250x250&cht=qr&chl=' + __obj.address
+      if (__wallet.success) {
 
-      return (
-        <div key={__obj.address} className="m8 demo-card-wide mdl-card mdl-shadow--2dp">
+        const coin = __obj.coin.toUpperCase()
+        const qr_code_url = 'https://chart.googleapis.com/chart?chs=250x250&cht=qr&chl=' + __obj.address
 
-
-          <div id={'title_' + __obj.address} className="mdl-card__title pos-rel">
-            <h2 className={'mdl-card__title-text pos-abs l24'}>{__obj.balance}</h2>
-            <h2 className={'mdl-card__title-text pos-abs r24'}>{coin}</h2>
-          </div>
-
-          <div id={'label_' + __obj.address} className="pl24 mdl-card__supporting-text">
-
-            <span>{__obj.label}</span>
-
-            <img id={'qr_code_' + __obj.address}
-                 className={'qr-code__image'}
-                 src={qr_code_url}
-                 alt={'QR Code'} />
-
-            <span>
+        return (
+          <div id={'wallet_' + __obj.address}  key={__obj.address} className="m8 demo-card-wide mdl-card mdl-shadow--2dp">
+            <div id={'title_' + __obj.address} className="mdl-card__title pos-rel">
+              <h2 className={'mdl-card__title-text pos-abs l24'}>{__obj.balance}</h2>
+              <h2 className={'mdl-card__title-text pos-abs r24'}>{coin}</h2>
+            </div>
+            <div id={'label_' + __obj.address} className="pl24 mdl-card__supporting-text">
+              <span>{__obj.label}</span>
+              <img id={'qr_code_' + __obj.address}
+                   className={'qr-code__image'}
+                   src={qr_code_url}
+                   alt={'QR Code'} />
+              <span>
               <span id={'address_' + __obj.address}
                     className={'address-hash'}
                     onClick={() => self.copyToClipboard(__obj.address)}>
                 <span id={'address_hash__display_' + __obj.address} >{__obj.address}</span>
                 <span id={'address_hash__copied_' + __obj.address} className={'address-hash__copied hide'} >
-
                   Copied to Clipboard!
                 </span>
               </span>
             </span>
-
-
+            </div>
+            <div className="mdl-card__actions mdl-card--border">
+              <button className="mdl-button mdl-js-button mdl-js-ripple-effect"
+                      onClick={() => {self.recieve(__obj.address)}}
+                      style={style.btn}>
+                Recieve <i className="material-icons mt-4">save_alt</i>
+              </button>
+              <button className="fr mdl-button mdl-js-button mdl-js-ripple-effect">
+                Send <i className="material-icons mt-4">send</i>
+              </button>
+            </div>
           </div>
+        )
+      } else {
 
-          <div className="mdl-card__actions mdl-card--border">
-            <button className="mdl-button mdl-js-button mdl-js-ripple-effect"
-                    onClick={() => {self.recieve(__obj.address)}}
-                    style={style.btn}>
-              Recieve <i className="material-icons mt-4">save_alt</i>
-            </button>
-            <button className="fr mdl-button mdl-js-button mdl-js-ripple-effect">
-              Send <i className="material-icons mt-4">send</i>
-            </button>
+        let error_message = __wallet.message
+
+        return (
+          <div key={chance.guid()} className="m8 demo-card-wide mdl-card mdl-shadow--2dp">
+            <div className="mdl-card__title pos-rel">
+              <h2 className={'mdl-card__title-text pos-abs l24'}>ERROR</h2>
+            </div>
+            <div style={{color: 'red', fontSize: 20}} className="pl24 mdl-card__supporting-text">
+              {error_message}
+            </div>
+            <div className="mdl-card__actions mdl-card--border">
+              <button className="fr mdl-button mdl-js-button mdl-js-ripple-effect">
+                Help <i className="material-icons mt-4">help</i>
+              </button>
+            </div>
           </div>
-
-        </div>
-      )
+        )
+      }
 
     })
 
@@ -189,3 +192,34 @@ __app().directive('walletCard', function () {
   }
 
 })
+
+function log_green (item) {
+  log.green(item)
+}
+
+const timeout = function (i, callback) {
+  return new Promise(function (resolve) {
+    return setTimeout(resolve, callback)
+  })
+}
+
+async function async_loop () {
+
+  for (let i = 0; i < 3; i++) {
+    await timeout(i, log_green(i))
+    console.log('I waited for: ', i)
+  }
+
+}
+
+async function async_log () {
+  console.log('after the loop')
+}
+
+(async function() {
+
+  await async_loop()
+  await async_log()
+  console.log('after the loop 2')
+
+})()

@@ -25,10 +25,12 @@ const endpoint = {
 }
 const websocket = io(endpoint.endpoint)
 
-websocket.emit('get_btc_wallet_list')
-websocket.on('btc_wallet_list', function (__btc_wallet_list) {
+websocket.emit('get_tbtc_wallet_list')
+websocket.on('tbtc_wallet_list', function (__btc_wallet_list) {
+
   store.dispatch({type: 'SET_BTC_WALLETS', payload: __btc_wallet_list})
   actions.setBtcWallets(__btc_wallet_list)
+
 })
 
 const app = angular.module('myApp', [])
