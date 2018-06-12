@@ -93,5 +93,6 @@ require('./components/Count')
 require('./components/CounterBtns')
 require('./components/Hello')
 require('./components/WalletCard/WalletCard')
+require('./components/Test/Test')
 
 registerServiceWorker()
