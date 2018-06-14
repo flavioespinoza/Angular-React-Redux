@@ -89,8 +89,7 @@ async function get_wallet_list (__coin, __socket) {
 
     __socket.emit('error_wallet', {
       message: __err.message,
-      in_function: 'get_wallet_list() try {} catch() {}',
-      log_color: 'cyan'
+      in_function: 'get_wallet_list() try {} catch() {}'
     })
 
   }
@@ -115,7 +114,6 @@ async function get_wallet (__coin, __wallet_id, __wallet_list, __socket) {
           let pending_withdrawls = 0
 
           for (let i = 0; i < __transfers.transfers.length; i++) {
-            let obj = __transfers.transfers[i]
             let state = 'confirmed'
             if (__transfers.transfers[i].state === 'unconfirmed') {
               state = 'pending'
@@ -155,6 +153,7 @@ async function get_wallet (__coin, __wallet_id, __wallet_list, __socket) {
         })
         .catch(function (error) {
           log.lightYellow('ERROR: Wallet Transfers')
+          log.lightYellow(error.message)
         })
 
     }).catch(function (__err) {
@@ -179,8 +178,7 @@ async function get_wallet (__coin, __wallet_id, __wallet_list, __socket) {
 
     __socket.emit('error_wallet', {
       message: __err.message,
-      in_function: 'get_wallet() try {} catch() {}',
-      log_color: 'cyan'
+      in_function: 'get_wallet() try {} catch() {}'
     })
 
   }
