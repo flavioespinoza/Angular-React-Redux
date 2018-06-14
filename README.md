@@ -22,14 +22,14 @@ $ npm install
 
 ```
 
-Open new and terminal type
+Open a terminal and type in
 ```code
 
 $ node server/bitgo-server
 
 ```
 
-Open different terminal and type
+Open a different terminal and type in
 ```code
 
 $ npm start
