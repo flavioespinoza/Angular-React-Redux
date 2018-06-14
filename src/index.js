@@ -1,10 +1,6 @@
 import angular from 'angular'
 import React, { Component } from 'react'
 import ReactDOM from 'react-dom'
-import Dialog from 'material-ui/Dialog';
-import FlatButton from 'material-ui/FlatButton';
-import RaisedButton from 'material-ui/RaisedButton';
-import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider'
 
 import { Provider } from 'react-redux'
 import { connect } from 'react-redux'
