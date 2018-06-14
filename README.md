@@ -1,6 +1,6 @@
 # Bitgo Demo on Testnet
 
-### You will need to a account set up on <https://test.bitgo.com>
+### You will need an account set up on <https://test.bitgo.com>
 
 ### Create a develop.js file in the server directory.
 
