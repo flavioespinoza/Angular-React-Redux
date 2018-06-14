@@ -42,7 +42,6 @@ class Container extends Component {
           <img src={logo} className="App-logo" alt="logo" />
           <h1 className="App-title">Angular React Redux App</h1>
         </header>
-
       </div>
     );
   }
@@ -73,7 +72,7 @@ __app().directive('appContainer', function () {
     template: '<div></div>',
     link: function (scope, element, attrs) {
 
-      ReactDOM.render(<Provider store={store} ><App /></Provider>, element[0])
+      ReactDOM.render(<Provider store={store}><App /></Provider>, element[0])
 
     }
   }
