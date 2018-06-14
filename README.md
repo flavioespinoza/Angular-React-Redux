@@ -1,4 +1,6 @@
-# Bitgo Demo
+# Bitgo Demo on Testnet
+
+### You will need to a account set up on <https://test.bitgo.com>
 
 ### Create a develop.js file in the server directory.
 
@@ -35,3 +37,7 @@ $ npm start
 ```
 
 You should be running on <http://localhost:3000/>
+
+### This only works with TBTC
+
+You can send TBTC to your Bitgo testnet addresses from <https://testnet.manu.backend.hamburg/faucet>
