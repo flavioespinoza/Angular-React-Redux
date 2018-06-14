@@ -1,12 +1,29 @@
 import store from '../stores/store'
 
+const log = require('ololog').configure({locate: false})
+
 export function setBtcWallets(__arr) {
   console.log('SET_BTC_WALLETS', __arr)
   return {
     type: 'SET_BTC_WALLETS',
     payload: __arr
   }
+}
 
+export function setAmount(__amount) {
+  log.green('SET_AMOUNT', __amount)
+  return {
+    type: 'SET_AMOUNT',
+    payload: __amount
+  }
+}
+
+export function toggleSendRecieve(__bool) {
+  log.red('TOGGLE_SEND_RECEIVE', __bool)
+  return {
+    type: 'TOGGLE_SEND_RECEIVE',
+    payload: __bool
+  }
 }
 
 export function setHelloMessage(__hello_msg) {

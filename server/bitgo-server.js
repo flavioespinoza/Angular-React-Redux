@@ -4,7 +4,6 @@ const port = process.env.PORT || 9001
 const http = require('http')
 const index = require('./routes/index')
 const server = http.createServer(app)
-const fs = require('fs')
 const socketIo = require('socket.io')
 const io = socketIo(server)
 const BitGoJS = require('bitgo')
@@ -23,7 +22,7 @@ const wallet_params = {
   name: 'bitgo',
   apiKey: keys.bitgo_api_key,
   secret: keys.bitgo_secret_key,
-  secret_passphrase: keys.secret_passphrase,
+  password: keys.bitgo_password,
   nonce: function () {
     return this.milliseconds()
   }
@@ -32,7 +31,8 @@ const wallet_params = {
 const bitgo = new BitGoJS.BitGo({
   env: 'test', accessToken: wallet_params.secret
 })
-const divisor = 100000000
+const satoshi = 1e8
+let __wallets = []
 
 async function get_wallet_list (__coin, __socket) {
 
@@ -40,15 +40,21 @@ async function get_wallet_list (__coin, __socket) {
 
     return bitgo.coin(__coin).wallets().list({}).then(async function (wallets) {
 
-      const wallet_list = []
+      let wallet_list = []
 
       let all_wallets = wallets.wallets
+      let simple_list = all_wallets.map(function (obj) {
+        return {
+          id: obj._wallet.id,
+          name: obj._wallet.label
+        }
+      })
 
       for (let i = 0; i < all_wallets.length; i++) {
 
         let id = all_wallets[i]._wallet.id
 
-        let single_wallet = await get_wallet(__coin, id, __socket)
+        let single_wallet = await get_wallet(__coin, id, simple_list, __socket)
 
         if (!single_wallet.address) {
           wallet_list.push({success: false, message: single_wallet, wallet: {}})
@@ -57,6 +63,8 @@ async function get_wallet_list (__coin, __socket) {
         }
 
       }
+
+      __wallets = wallet_list
 
       let list_name = __coin + '_wallet_list'
       __socket.emit(list_name, wallet_list)
@@ -89,7 +97,7 @@ async function get_wallet_list (__coin, __socket) {
 
 }
 
-async function get_wallet (__coin, __wallet_id, __socket) {
+async function get_wallet (__coin, __wallet_id, __wallet_list, __socket) {
 
   try {
 
@@ -97,14 +105,57 @@ async function get_wallet (__coin, __wallet_id, __socket) {
 
       let wallet_info = {}
       let __wallet = wallet._wallet
+      let label = wallet._wallet.label
 
-      wallet_info.label = __wallet.label
-      wallet_info.coin = __wallet.coin
-      wallet_info.address = __wallet.receiveAddress.address
-      wallet_info.satoshi = __wallet.balance
-      wallet_info.balance = wallet_info.satoshi / divisor
+      return wallet.transfers()
+        .then(function (__transfers) {
 
-      return wallet_info
+          let transfer_list = []
+          let pending_deposits = 0
+          let pending_withdrawls = 0
+
+          for (let i = 0; i < __transfers.transfers.length; i++) {
+            let obj = __transfers.transfers[i]
+            let state = 'confirmed'
+            if (__transfers.transfers[i].state === 'unconfirmed') {
+              state = 'pending'
+              if (Math.sign(__transfers.transfers[i].value) === -1) {
+                pending_withdrawls += __transfers.transfers[i].value / satoshi
+              } else {
+                pending_deposits += __transfers.transfers[i].value / satoshi
+              }
+            }
+            transfer_list.push({
+              value: __transfers.transfers[i].value / satoshi,
+              state: state,
+              usd: __transfers.transfers[i].usd,
+            })
+          }
+
+          let transfers = {
+            name: label,
+            count: __transfers.transfers.length,
+            list: transfer_list
+          }
+
+          wallet_info.id = __wallet.id
+          wallet_info.label = label
+          wallet_info.coin = __wallet.coin
+          wallet_info.address = __wallet.receiveAddress.address
+          wallet_info.satoshi = __wallet.balance
+          wallet_info.transfers = transfers
+          wallet_info.pending_deposits = pending_deposits
+          wallet_info.pending_withdrawls = pending_withdrawls
+          wallet_info.balance   = __wallet.balance / satoshi
+          wallet_info.confirmed = __wallet.confirmedBalance / satoshi
+          wallet_info.spendable = __wallet.spendableBalance / satoshi
+
+          return wallet_info
+
+        })
+        .catch(function (error) {
+          log.lightYellow('ERROR: Wallet Transfers')
+        })
 
     }).catch(function (__err) {
 
@@ -136,6 +187,42 @@ async function get_wallet (__coin, __wallet_id, __socket) {
 
 }
 
+async function send_transaction (__params, __socket) {
+
+  let send_to_address = __params.addresses.to
+  let send_from_address = __params.addresses.from
+  let amount = __params.amount * satoshi
+
+  bitgo.coin(__params.coin).wallets().getWalletByAddress({address: send_from_address})
+    .then(function (wallet) {
+
+      let my_wallet = wallet
+
+      let params = {
+        amount: amount,
+        address: send_to_address,
+        walletPassphrase: wallet_params.password
+      }
+
+      my_wallet.send(params)
+        .then(function (transaction) {
+
+          log.bright.cyan(transaction)
+          __socket.emit('transaction', transaction)
+
+        })
+        .catch(function (error) {
+          log.yellow(error)
+        })
+
+    })
+    .catch(function (error) {
+      log.lightYellow(error)
+    })
+
+}
+
+
 /** Websocket */
 io.on('connection', function (socket) {
 
@@ -143,6 +230,10 @@ io.on('connection', function (socket) {
 
   socket.on('get_tbtc_wallet_list', async function () {
     await get_wallet_list('tbtc', socket)
+  })
+
+  socket.on('send_transaction', async function (__params) {
+    await send_transaction(__params, socket)
   })
 
 })

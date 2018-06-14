@@ -1,11 +1,13 @@
 .demo-card-wide.mdl-card {
   width: 512px;
+  height: 325px;
+  overflow: hidden;
   float: left; }
 
 .demo-card-wide .mdl-card__title {
   color: #fff;
-  height: 176px;
-  background: #7f7f7f;
+  height: 228px;
+  background: #3e3e3e;
   transition: height 0.25s ease-out; }
 .demo-card-wide .mdl-card__title.title-collapse {
   height: 56px;
@@ -16,7 +18,6 @@
 
 .qr-code__image {
   margin-top: -22px;
-  margin-left: 0;
   pointer-events: none;
   height: 0;
   transition: height 0.25s ease-out; }
@@ -28,10 +29,11 @@
 .address-hash {
   position: absolute;
   display: none;
-  width: 300px;
-  left: 6px;
+  width: 218px;
+  left: 12px;
   bottom: 20px;
   text-align: center;
+  font-size: 9.5px;
   color: cornflowerblue;
   padding: 4px 8px;
   cursor: copy;
@@ -48,22 +50,97 @@
   display: block;
   transition: height 0.50s ease-in; }
 
-.hide {
-  display: none; }
+.collapse-btn-wrapper {
+  text-align: center;
+  width: 100%; }
+
+.collapse-btn {
+  color: #ff8200;
+  font-size: 8px !important; }
+
+.send-input-wrapper {
+  background: #ededed;
+  padding: 4px 8px;
+  overflow: hidden;
+  margin-top: 6px;
+  margin-bottom: 4px; }
+  .send-input-wrapper input {
+    margin-top: 6px;
+    padding: 4px;
+    width: 45px; }
+  .send-input-wrapper button {
+    width: 172px; }
+
+.send-input-wrapper:first-child {
+  margin-top: 0; }
+
+.send-input-wrapper:last-child {
+  margin-bottom: 12px; }
+
+.mdl-button {
+  font-size: 9px !important; }
+
+.receive {
+  position: absolute;
+  width: 50%;
+  top: 20px;
+  right: 0;
+  height: 0;
+  overflow: scroll;
+  transition: height 0.25s ease-out; }
+  .receive ::-webkit-scrollbar {
+    -webkit-appearance: none;
+    width: 7px; }
+  .receive ::-webkit-scrollbar-thumb {
+    border-radius: 4px;
+    background-color: rgba(0, 0, 0, 0.5);
+    -webkit-box-shadow: 0 0 1px rgba(255, 255, 255, 0.5); }
+
+.receive.receive-expand {
+  height: 212px;
+  transition: height 0.25s ease-in; }
+
+.send {
+  display: block;
+  margin-top: 8px;
+  height: 0;
+  overflow: scroll;
+  transition: height 0.25s ease-out; }
+
+.send.send-expand {
+  height: 198px;
+  transition: height 0.25s ease-in; }
+
+.send::-webkit-scrollbar,
+.receive::-webkit-scrollbar {
+  -webkit-appearance: none;
+  width: 7px; }
+
+.send::-webkit-scrollbar-thumb,
+.receive::-webkit-scrollbar-thumb {
+  border-radius: 4px;
+  background-color: rgba(0, 0, 0, 0.5);
+  -webkit-box-shadow: 0 0 1px rgba(255, 255, 255, 0.5); }
 
 .mdl-card__menu {
   top: 10px; }
 
 .mdl-card__supporting-text {
   position: relative;
-  height: 20px;
+  height: 28px;
+  width: calc(100% - 40px);
+  padding-bottom: 0;
   transition: height 0.25s ease-out; }
 
 .mdl-card__supporting-text.text-expand {
   height: 200px;
-  transition: height 0.25s ease-in; }
+  padding-bottom: 0;
+  transition: height  0.25s ease-in; }
 
-.mdl-card__supporting-text {
-  width: calc(100% - 40px); }
+p.mdl-card__title-text {
+  font-size: 14px; }
+
+.hide {
+  display: none; }
 
 /*# sourceMappingURL=WalletCard.css.map */

@@ -1,23 +1,44 @@
-export function uniq_all_props(__arr1, __arr2) {
+export function __display(number, digits) {
 
-  let arr = __arr1.concat(__arr2)
-  let set = []
-  let result = []
+  let res
+  let val
+  let precision
 
-  /** Set each obj to a string. */
-  arr.forEach(function (__obj) {
-    let string = JSON.stringify(__obj)
-    set.push(string)
-  })
+  if (typeof number !== 'number') {
+    val = Number(number) || 0
+  } else {
+    val = number
+  }
 
-  /** Use filter as a loop to push onto results array.
-   * Done to preserve prop types from original arrays */
-  set.filter(function (elem, index, self) {
-    if (index === self.indexOf(elem)) {
-      result.push(arr[index])
+  if (val === 0) {
+
+    return '0.' + add_zeros(digits)
+  }
+
+  function add_zeros(length) {
+    let result = ''
+    for (let i = 0; i < length; i++) {
+      result += '0'
     }
-  })
+    return result
+  }
 
-  return result
+  let re = new RegExp('(\\d+\\.\\d{' + digits + '})(\\d)')
+  let m = val.toString().match(re)
+  res = m ? parseFloat(m[1]) : val
+
+  if ((res.toString()).split('.')[1]) {
+    precision = (res.toString()).split('.')[1].length
+  } else {
+    precision = 4
+  }
+
+
+  if (precision < digits) {
+    let length = digits - precision
+    return res.toString() + add_zeros(length)
+  }
+
+  return res.toString()
 
 }

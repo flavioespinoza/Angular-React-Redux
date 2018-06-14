@@ -1,10 +1,14 @@
 import angular from 'angular'
 import React, { Component } from 'react'
 import ReactDOM from 'react-dom'
+import Dialog from 'material-ui/Dialog';
+import FlatButton from 'material-ui/FlatButton';
+import RaisedButton from 'material-ui/RaisedButton';
+import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider'
 
 import { Provider } from 'react-redux'
-import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
+import { bindActionCreators } from 'redux'
 import store from './redux/stores/store'
 
 import logo from './logo.svg'
@@ -12,7 +16,6 @@ import registerServiceWorker from './registerServiceWorker'
 import io from 'socket.io-client'
 import * as actions from './redux/actions/actions'
 
-import './App.css'
 import './index.css'
 
 const log = require('ololog').configure({
@@ -25,17 +28,13 @@ const endpoint = {
 }
 const websocket = io(endpoint.endpoint)
 
-websocket.emit('get_tbtc_wallet_list')
-websocket.on('tbtc_wallet_list', function (__btc_wallet_list) {
-
-  store.dispatch({type: 'SET_BTC_WALLETS', payload: __btc_wallet_list})
-  actions.setBtcWallets(__btc_wallet_list)
-
-})
-
 const app = angular.module('myApp', [])
 
-app.controller('MainController', function ($scope) {
+export function __app () {
+  return app
+}
+
+__app().controller('MainController', function ($scope) {
 
 })
 
@@ -70,7 +69,7 @@ const App = connect(
   mapDispatchToProps
 )(Container)
 
-app.directive('appContainer', function () {
+__app().directive('appContainer', function () {
 
   return {
     restrict: 'E',
@@ -85,14 +84,20 @@ app.directive('appContainer', function () {
 
 })
 
-export function __app () {
-  return app
-}
-
-require('./components/Count')
-require('./components/CounterBtns')
-require('./components/Hello')
 require('./components/WalletCard/WalletCard')
-require('./components/Test/Test')
+
+/** Websocket */
+websocket.emit('get_tbtc_wallet_list')
+websocket.on('tbtc_wallet_list', function (__btc_wallet_list) {
+
+  store.dispatch({type: 'SET_BTC_WALLETS', payload: __btc_wallet_list})
+
+})
+
+export function ___send_transaction (__params) {
+  websocket.emit('send_transaction', __params)
+  log.blue('send_transaction')
+  console.log(__params)
+}
 
 registerServiceWorker()
