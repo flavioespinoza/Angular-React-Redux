@@ -1,6 +1,6 @@
-##Bitgo Demo
+# Bitgo Demo
 
-Create a develop.js file in the server directory.
+### Create a develop.js file in the server directory.
 
 Copy the code below, paste it in the develop.js file and place your api keys and password.
 
